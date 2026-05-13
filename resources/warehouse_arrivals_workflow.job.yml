@@ -1,0 +1,24 @@
+# yaml-language-server: $schema=../bundle_config_schema.json
+resources:
+  jobs:
+    warehouse_arrivals_workflow:
+      name: warehouse_arrivals_workflow
+
+      parameters:
+        - name: catalog
+          default: ${resources.schemas.warehouse_arrivals_schema.catalog_name}
+        - name: schema
+          default: ${resources.schemas.warehouse_arrivals_schema.name}
+        - name: volume
+          default: ${resources.volumes.raw_data_volume.name}
+        - name: reset_all
+          default: "false"
+        - name: reset_gps
+          default: "false"
+        - name: reset_geofences
+          default: "false"
+
+      tasks:
+        - task_key: refresh_warehouse_pipeline
+          pipeline_task:
+            pipeline_id: ${resources.pipelines.warehouse_arrivals_pipeline.id}

@@ -1,0 +1,21 @@
+# yaml-language-server: $schema=../bundle_config_schema.json
+resources:
+  pipelines:
+    warehouse_arrivals_pipeline:
+      name: warehouse_arrivals_pipeline
+      catalog: ${resources.schemas.warehouse_arrivals_schema.catalog_name}
+      schema: ${resources.schemas.warehouse_arrivals_schema.name}
+      serverless: true
+      root_path: ../src/warehouse_arrivals_dab
+      configuration:
+        warehouse_arrivals.catalog: ${resources.schemas.warehouse_arrivals_schema.catalog_name}
+        warehouse_arrivals.schema: ${resources.schemas.warehouse_arrivals_schema.name}
+        warehouse_arrivals.volume: ${resources.volumes.raw_data_volume.name}
+
+      libraries:
+        - glob:
+            include: ../src/warehouse_arrivals_dab/transformations/**
+
+      environment:
+        dependencies:
+          - --editable ${workspace.file_path}

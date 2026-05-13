@@ -1,0 +1,53 @@
+# yaml-language-server: $schema=bundle_config_schema.json
+bundle:
+  name: warehouse_arrivals_dab
+  uuid: 6b166f86-1254-4c51-9172-550919c9c430
+
+include:
+  - resources/*.yml
+
+workspace:
+  host: https://dbc-a0c8a9de-a631.cloud.databricks.com
+
+variables:
+  catalog:
+    description: Unity Catalog catalog for the warehouse arrivals project
+  schema:
+    description: Unity Catalog schema for the warehouse arrivals project
+  volume:
+    description: Managed volume name for sample raw data
+    default: raw_data
+
+targets:
+  dev:
+    default: true
+    mode: development
+    variables:
+      catalog: workspace
+      schema: warehouse_arrivals
+    resources:
+      jobs:
+        warehouse_arrivals_workflow:
+          tasks:
+            - task_key: load_sample_input_data
+              notebook_task:
+                notebook_path: ./src/warehouse_arrivals_dab/sample_data/sample_input_data.py
+                base_parameters:
+                  catalog: '{{job.parameters.catalog}}'
+                  schema: '{{job.parameters.schema}}'
+                  volume: '{{job.parameters.volume}}'
+                  reset_all: '{{job.parameters.reset_all}}'
+                  reset_gps: '{{job.parameters.reset_gps}}'
+                  reset_geofences: '{{job.parameters.reset_geofences}}'
+
+            - task_key: refresh_warehouse_pipeline
+              depends_on:
+                - task_key: load_sample_input_data
+
+  prod:
+    mode: production
+    workspace:
+      root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/${bundle.target}
+    variables:
+      catalog: main
+      schema: warehouse_arrivals

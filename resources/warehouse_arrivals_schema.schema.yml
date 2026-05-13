@@ -1,0 +1,7 @@
+# yaml-language-server: $schema=../bundle_config_schema.json
+resources:
+  schemas:
+    warehouse_arrivals_schema:
+      catalog_name: ${var.catalog}
+      name: ${var.schema}
+      comment: SQL-first location-aware Lakeflow tutorial schema for warehouse arrivals.

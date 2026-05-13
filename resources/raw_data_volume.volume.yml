@@ -1,0 +1,8 @@
+# yaml-language-server: $schema=../bundle_config_schema.json
+resources:
+  volumes:
+    raw_data_volume:
+      catalog_name: ${resources.schemas.warehouse_arrivals_schema.catalog_name}
+      schema_name: ${resources.schemas.warehouse_arrivals_schema.name}
+      name: ${var.volume}
+      volume_type: MANAGED
