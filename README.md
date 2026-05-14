@@ -24,6 +24,8 @@ In short, this repo keeps the tutorial's warehouse-arrivals example, but wraps i
 ## Local setup
 
 ```bash
+git clone https://github.com/maprihoda/warehouse_arrivals_dab.git
+
 cd warehouse_arrivals_dab
 
 uv sync
@@ -49,8 +51,24 @@ databricks bundle validate --output json     # double-check how variables were r
 Deploy the bundle:
 
 ```bash
-databricks bundle deploy
+databricks bundle deploy -t dev
 ```
+
+Sync local source changes into the already-deployed bundle workspace files:
+
+```bash
+databricks bundle sync -t dev
+```
+
+Use `bundle sync` during active development when you have already deployed the `dev` target and want to quickly push updated notebooks, Python files, SQL files, and other synced project assets without doing a full redeploy. This is convenient for fast iteration on code changes, but if you change bundle configuration or resource definitions in a way that affects deployment, use `databricks bundle deploy -t dev` again.
+
+Continuously sync changes while you edit:
+
+```bash
+databricks bundle sync --watch -t dev
+```
+
+Use `--watch` when you are iterating locally and want file changes to be uploaded automatically as you save. This is especially useful while developing pipeline logic or notebooks against the `dev` target. Stop it with `Ctrl+C` when you are done. As with regular `sync`, switch back to `deploy` whenever you change infrastructure-level bundle settings or resource configuration.
 
 ### Note on dev target naming
 
