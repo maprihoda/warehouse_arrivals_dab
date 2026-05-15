@@ -1,5 +1,9 @@
-from pyspark import pipelines as dp
+from typing import Any
 
+from databricks.sdk.runtime import spark
+from pyspark import pipelines
+
+dp: Any = pipelines
 
 CATALOG_CONF = "warehouse_arrivals.catalog"
 SCHEMA_CONF = "warehouse_arrivals.schema"

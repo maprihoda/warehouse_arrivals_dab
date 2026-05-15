@@ -4,9 +4,15 @@ resources:
     warehouse_arrivals_pipeline:
       name: warehouse_arrivals_pipeline
       catalog: ${resources.schemas.warehouse_arrivals_schema.catalog_name}
+      # Reference the schema resource, not var.schema directly, so this always
+      # uses the actual schema the bundle resolves to (for example, if dev mode
+      # later prefixes the schema name per user).
       schema: ${resources.schemas.warehouse_arrivals_schema.name}
       serverless: true
       root_path: ../src/warehouse_arrivals_dab
+      # Expose bundle values to the pipeline code as Spark configs.
+      # Python cannot directly read bundle YAML fields like `catalog` or `schema`,
+      # so the code accesses these with spark.conf.get("warehouse_arrivals.*").
       configuration:
         warehouse_arrivals.catalog: ${resources.schemas.warehouse_arrivals_schema.catalog_name}
         warehouse_arrivals.schema: ${resources.schemas.warehouse_arrivals_schema.name}

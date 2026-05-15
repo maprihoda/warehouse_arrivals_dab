@@ -16,6 +16,7 @@ Databricks executes it as a notebook task from the bundle definition.
 from datetime import datetime, timezone
 from uuid import uuid4
 
+from databricks.sdk.runtime import dbutils, spark
 from pyspark.sql import functions as F
 
 
