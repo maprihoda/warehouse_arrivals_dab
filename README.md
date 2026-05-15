@@ -1,25 +1,24 @@
 # warehouse_arrivals_dab
 
-A Databricks sample project that demonstrates how to build a warehouse arrivals data pipeline using Declarative Automation Bundles, based on the Databricks [tutorial](https://learn.microsoft.com/en-us/azure/databricks/ldp/tutorial-spatial-pipelines) for [Lakeflow Declarative Pipelines](https://learn.microsoft.com/en-us/azure/databricks/ldp/).
+A Databricks sample project that shows how to build a warehouse arrivals data pipeline using Declarative Automation Bundles, based on the Databricks [tutorial](https://learn.microsoft.com/en-us/azure/databricks/ldp/tutorial-spatial-pipelines) for [Lakeflow Declarative Pipelines](https://learn.microsoft.com/en-us/azure/databricks/ldp/).
 
-This repository packages the tutorial workflow into a runnable project that you can validate, deploy, and run in Databricks Free Edition by using the Databricks CLI.
+This repository turns the tutorial workflow into a runnable project that you can validate, deploy, and run in Databricks Free Edition with the Databricks CLI.
 
 ## How this project extends the tutorial
 
-The original Databricks tutorial focuses on the core Lakeflow pipeline logic. This sample project takes that foundation and turns it into a more complete, reusable project that is easier to deploy, rerun, and adapt.
+The original Databricks tutorial focuses on the core Lakeflow pipeline logic. This sample project builds on that foundation and turns it into a more complete, reusable project that is easier to deploy, rerun, and adapt.
 
 Key differences and enhancements include:
 
 - **Bundle-based project structure**: the pipeline is packaged as a Databricks bundle, with the schema, managed volume, pipeline, and workflow job defined as deployable resources.
-- **End-to-end deployment workflow**: instead of creating pieces manually, you can validate, deploy, and run the whole project through the Databricks CLI.
+- **Local-first development workflow**: the project was built entirely on a local machine, without creating pipeline assets in the Databricks UI or using the VS Code extension, to show that a Databricks Asset Bundles project can be developed much like a standard software project.
 - **Databricks Free Edition-friendly setup**: the repository is organized so you can run the sample in a lightweight environment without needing a larger production setup.
 - **Automated sample-data loading**: on the `dev` target, a workflow task loads sample GPS and geofence data before refreshing the pipeline, making repeated demo runs easier. On subsequent runs, it writes a new incremental batch of GPS data to demonstrate incremental processing, which is a core Lakeflow Declarative Pipelines pattern.
 - **Parameterized reruns and resets**: the workflow accepts runtime parameters such as `reset_all`, `reset_gps`, and `reset_geofences`, so you can control how input data is regenerated.
 - **Environment-aware targets**: the bundle includes a `dev` target and a starter `prod` target, making the project easier to promote beyond a single tutorial-style setup.
-- **Source-controlled project layout**: pipeline code, SQL transformations, and sample-data loading logic are stored in a clean repository structure under `src/` and `resources/`.
 - **Validation assets included**: the repository includes validation queries and a notebook to help verify that the gold outputs were created as expected.
 
-In short, this repo keeps the tutorial's warehouse-arrivals example, but wraps it in a more practical project structure for local development, repeatable deployment, and iterative testing.
+In short, this repo keeps the tutorial's warehouse-arrivals example but wraps it in a more practical structure for local development, repeatable deployment, and iterative testing.
 
 ## Local setup
 
@@ -60,7 +59,7 @@ Sync local source changes into the already-deployed bundle workspace files:
 databricks bundle sync -t dev
 ```
 
-Use `bundle sync` during active development when you have already deployed the `dev` target and want to quickly push updated notebooks, Python files, SQL files, and other synced project assets without doing a full redeploy. This is convenient for fast iteration on code changes, but if you change bundle configuration or resource definitions in a way that affects deployment, use `databricks bundle deploy -t dev` again.
+Use `bundle sync` during active development when you have already deployed the `dev` target and want to quickly push updated notebooks, Python files, SQL files, and other synced project assets without a full redeploy. It is convenient for fast code iteration, but if you change bundle configuration or resource definitions in a way that affects deployment, run `databricks bundle deploy -t dev` again.
 
 Continuously sync changes while you edit:
 
@@ -68,7 +67,7 @@ Continuously sync changes while you edit:
 databricks bundle sync --watch -t dev
 ```
 
-Use `--watch` when you are iterating locally and want file changes to be uploaded automatically as you save. This is especially useful while developing pipeline logic or notebooks against the `dev` target. Stop it with `Ctrl+C` when you are done. As with regular `sync`, switch back to `deploy` whenever you change infrastructure-level bundle settings or resource configuration.
+Use `--watch` when you want local file changes to upload automatically as you save. This is especially useful while developing pipeline logic or notebooks against the `dev` target. Stop it with `Ctrl+C` when you are done. As with regular `sync`, switch back to `deploy` whenever you change infrastructure-level bundle settings or resource configuration.
 
 ### Note on dev target naming
 
@@ -134,7 +133,7 @@ databricks bundle run warehouse_arrivals_workflow \
   --params reset_gps=true,reset_geofences=true
 ```
 
-You can also override other job parameters, such as `catalog`, `schema`, and `volume`, in the same way.
+You can also override other job parameters, such as `catalog`, `schema`, and `volume`, the same way.
 
 ```bash
 # override catalog / schema / volume
@@ -154,37 +153,23 @@ We generated the file with:
 databricks bundle schema > bundle_config_schema.json
 ```
 
-We then referenced it from the bundle YAML files with comments such as:
-
-```yaml
-# yaml-language-server: $schema=bundle_config_schema.json
-```
-
-Or, for files under `resources/`:
-
-```yaml
-# yaml-language-server: $schema=../bundle_config_schema.json
-```
-
-This is mainly for local authoring ergonomics. The YAML language server used by editors such as VS Code can read that schema file and then:
+It is checked in mainly for local authoring ergonomics. Editors such as VS Code can use it to:
 
 - validate bundle YAML structure while you type
 - flag unknown or misspelled properties early
 - offer autocomplete for supported bundle fields
 - show inline documentation and hover help for many settings
-- reduce mistakes when editing nested Databricks bundle resource definitions
 
-In other words, it makes the bundle configuration behave more like a typed configuration file than plain YAML.
+In short, it makes the bundle configuration feel more like a typed config file than plain YAML.
 
 A few practical notes:
 
 - this is an editor aid, not a runtime requirement for Databricks deployment
-- the relative path in each comment matters: `databricks.yml` points to `bundle_config_schema.json`, while files in `resources/` point to `../bundle_config_schema.json`
 - if you upgrade the Databricks CLI and want the latest schema, regenerate the file with `databricks bundle schema > bundle_config_schema.json`
 
 ## Validation queries
 
-A Databricks notebook with these checks, plus additional validation queries, is available at:
+A Databricks notebook with these checks and additional validation queries is available at:
 
 - `src/warehouse_arrivals_dab/notebooks/validation_queries.ipynb`
 
